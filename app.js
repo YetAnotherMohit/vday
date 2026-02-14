@@ -160,13 +160,22 @@
       if (num === 4) initScratchCanvas();
       if (num === 5) startCelebration();
       if (num === 'final') startFinalPage();
+
+      // Switch music track
+      if (musicStarted && !musicMuted) {
+        playTrackForScene(num);
+      }
     }
   }
 
   // ===== SCENE 1: NAME GATE =====
   function handleNameSubmit() {
     const name = nameInput.value.trim().toUpperCase();
-    if (name === 'AMAN') {
+
+    // Allow GOLUDI, GOLUDII, GOLUDIII... (any number of 'I's at end)
+    const validNameRegex = /^GOLUDI+$/;
+
+    if (validNameRegex.test(name)) {
       errorMsg.textContent = '';
       nameInput.style.borderColor = 'var(--gold)';
 
@@ -182,9 +191,9 @@
     } else {
       const responses = [
         `"${nameInput.value}"? Yeh koi naam hai? 😤`,
-        'Sirf AMAN ke liye hai yeh! 💛',
+        'Sirf Goludiii ke liye hai yeh! 💛',
         'Galat naam! Try again... 🌻',
-        'Arre yaar, AMAN likho! 😂',
+        'Arre yaar, sahi naam likho! 😂',
         'Naam galat hai, pyaar sahi hai ❤️',
       ];
       errorMsg.textContent = responses[Math.floor(Math.random() * responses.length)];
@@ -252,7 +261,7 @@
     sparkle.style.width = `${4 + Math.random() * 8}px`;
     sparkle.style.height = sparkle.style.width;
 
-    const colors = ['#F4C430', '#FFE066', '#D4A527', '#FFD700', '#FFF'];
+    const colors = ['#F4C430', '#FFE066', '#D7BDE2', '#9B59B6', '#FFD700', '#FFF'];
     sparkle.style.background = colors[Math.floor(Math.random() * colors.length)];
 
     sparkleContainer.appendChild(sparkle);
@@ -274,19 +283,19 @@
       }, i * 30);
     }
 
-    // Open envelope
+    // Open envelope — slower so user can read the letter
     setTimeout(() => {
       envelopeFlap.classList.add('open');
-    }, 400);
+    }, 600);
 
     setTimeout(() => {
       envelopeLetter.classList.add('emerge');
-    }, 800);
+    }, 1400);
 
-    // Move to scene 3 after letter emerges
+    // Move to scene 3 after enough reading time
     setTimeout(() => {
       goToScene(3);
-    }, 2500);
+    }, 5000);
   }
 
   // ===== SCENE 4: SCRATCH CARD =====
@@ -322,7 +331,13 @@
     const startScratch = (e) => {
       e.preventDefault();
       scratching = true;
+      const pos = getPos(e);
       scratchCtx.globalCompositeOperation = 'destination-out';
+      scratchCtx.lineWidth = 45;
+      scratchCtx.lineCap = 'round';
+      scratchCtx.lineJoin = 'round';
+      scratchCtx.beginPath();
+      scratchCtx.moveTo(pos.x, pos.y);
     };
 
     const doScratch = (e) => {
@@ -330,15 +345,16 @@
       e.preventDefault();
       const pos = getPos(e);
 
-      scratchCtx.beginPath();
-      scratchCtx.arc(pos.x, pos.y, 22, 0, Math.PI * 2);
-      scratchCtx.fill();
+      // Smooth line instead of discrete circles
+      scratchCtx.lineTo(pos.x, pos.y);
+      scratchCtx.stroke();
 
       checkScratchProgress();
     };
 
     const endScratch = () => {
       scratching = false;
+      scratchCtx.beginPath(); // Reset path for next stroke
     };
 
     canvas.addEventListener('mousedown', startScratch);
@@ -395,12 +411,17 @@
 
     scratchPercent = (transparent / total) * 100;
 
-    if (scratchPercent > 40) {
+    if (scratchPercent > 80) {
       // Reveal complete!
       bloomingSunflowers.classList.add('active');
 
-      // Clear remaining overlay
-      scratchCtx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+      // Smooth fade-out of remaining glitter
+      scratchCanvas.style.transition = 'opacity 0.6s ease';
+      scratchCanvas.style.opacity = '0';
+      setTimeout(() => {
+        scratchCtx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+        scratchCanvas.style.opacity = '1';
+      }, 600);
 
       // Show Mohabbatein quote
       const scratchQuote = $('#scratchQuote');
@@ -435,8 +456,8 @@
     confettiCtx = canvas.getContext('2d');
 
     // Create confetti pieces
-    const emojis = ['🌹', '❤️', '💛', '🌻', '✨', '💕', '🎉', '💐'];
-    const colors = ['#E8547C', '#F4C430', '#FFE066', '#FF6B9D', '#C94040', '#D4A527'];
+    const emojis = ['🌹', '💜', '🌻', '✨', '💕', '🎉', '💐', '💜'];
+    const colors = ['#9B59B6', '#F4C430', '#FFE066', '#D7BDE2', '#D4A527', '#FF6B9D'];
 
     for (let i = 0; i < 80; i++) {
       confettiPieces.push({
@@ -504,7 +525,7 @@
   }
 
   function createFloatingHearts() {
-    const hearts = ['❤️', '💛', '🌻', '💕', '✨', '💐'];
+    const hearts = ['💜', '🌻', '💕', '✨', '💐', '❤️'];
     for (let i = 0; i < 15; i++) {
       const heart = document.createElement('div');
       heart.className = 'floating-heart';
@@ -517,74 +538,161 @@
     }
   }
 
-  // ===== MUSIC =====
-  let audioCtx = null;
-  let musicPlaying = false;
+  // ===== MUSIC SYSTEM =====
+  const sceneTracks = {
+    1: 'assets/tujhe-dekha-toh-yeh-jana-sanam-instrumental_d08nFMFK.mp3',
+    2: 'assets/suraj-hua-_madham.mp3',
+    3: 'assets/kal_ho_na_ho.mp3',
+    4: 'assets/kal_ho_na_ho.mp3',
+    5: 'assets/tujhmein_flute_version.mp3',
+    final: 'assets/tujhmein_flute_version.mp3',
+  };
 
-  function toggleMusic() {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  let currentAudio = null;
+  let currentTrackSrc = null;
+  let musicPlaying = false;
+  let musicMuted = false;
+  let musicStarted = false;
+
+  function playTrackForScene(sceneId) {
+    const src = sceneTracks[sceneId];
+    if (!src) return;
+
+    console.log(`🎵 Attempting to play track for scene ${sceneId}: ${src}`);
+
+    // Same track already playing — don't restart, let it flow (Orchestra style)
+    if (currentTrackSrc === src && currentAudio && !currentAudio.paused) {
+      console.log('🎵 Track already playing, continuing flow.');
+      return;
     }
 
-    if (musicPlaying) {
-      musicPlaying = false;
-      musicToggle.classList.remove('playing');
-      musicToggle.textContent = '🎵';
-    } else {
-      musicPlaying = true;
+    // Crossfade: Slow cinematic fade out of old track
+    if (currentAudio) {
+      const oldAudio = currentAudio;
+      // 2.0s fade out for composed feel
+      fadeOut(oldAudio, 2.0, () => {
+        oldAudio.pause();
+        oldAudio.src = '';
+      });
+    }
+
+    // Create new audio
+    const audio = new Audio(src);
+    audio.loop = true;
+    audio.volume = 0;
+    audio.muted = musicMuted;
+    currentAudio = audio;
+    currentTrackSrc = src;
+
+    const playPromise = audio.play();
+
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        console.log('🎵 Playback started successfully.');
+        // 2.0s fade in for smooth orchestral entry
+        fadeIn(audio, 2.0, musicMuted ? 0 : 0.8);
+        musicPlaying = true;
+        updateMusicButton();
+      }).catch((error) => {
+        console.warn('🎵 Autoplay blocked or error:', error);
+        musicPlaying = false;
+        updateMusicButton();
+      });
+    }
+  }
+
+  function fadeOut(audio, duration, onDone) {
+    const steps = 20;
+    const interval = (duration * 1000) / steps;
+    const volumeStep = audio.volume / steps;
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      audio.volume = Math.max(0, audio.volume - volumeStep);
+      if (step >= steps) {
+        clearInterval(timer);
+        if (onDone) onDone();
+      }
+    }, interval);
+  }
+
+  function fadeIn(audio, duration, targetVol) {
+    const steps = 20;
+    const interval = (duration * 1000) / steps;
+    const volumeStep = targetVol / steps;
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      audio.volume = Math.min(targetVol, audio.volume + volumeStep);
+      if (step >= steps) {
+        clearInterval(timer);
+      }
+    }, interval);
+  }
+
+  function updateMusicButton() {
+    if (musicPlaying && !musicMuted) {
       musicToggle.classList.add('playing');
       musicToggle.textContent = '🎶';
-      playMelody();
+    } else {
+      musicToggle.classList.remove('playing');
+      musicToggle.textContent = '�';
     }
   }
 
-  function playMelody() {
-    if (!musicPlaying || !audioCtx) return;
+  function toggleMusic() {
+    if (!musicStarted) {
+      // First time — start music explicitly
+      console.log('🎵 User toggled music: Starting first time.');
+      startMusicSystem();
+      return;
+    }
 
-    // Simple romantic melody using Web Audio API
-    const notes = [
-      { freq: 523.25, dur: 0.4 }, // C5
-      { freq: 587.33, dur: 0.4 }, // D5
-      { freq: 659.25, dur: 0.6 }, // E5
-      { freq: 587.33, dur: 0.4 }, // D5
-      { freq: 523.25, dur: 0.6 }, // C5
-      { freq: 493.88, dur: 0.4 }, // B4
-      { freq: 523.25, dur: 0.8 }, // C5
-      { freq: 0, dur: 0.4 },      // rest
-      { freq: 659.25, dur: 0.4 }, // E5
-      { freq: 698.46, dur: 0.4 }, // F5
-      { freq: 783.99, dur: 0.6 }, // G5
-      { freq: 698.46, dur: 0.4 }, // F5
-      { freq: 659.25, dur: 0.6 }, // E5
-      { freq: 587.33, dur: 0.4 }, // D5
-      { freq: 523.25, dur: 0.8 }, // C5
-    ];
+    musicMuted = !musicMuted;
+    console.log(`🎵 User toggled music: Muted = ${musicMuted}`);
 
-    let time = audioCtx.currentTime;
-    notes.forEach((note) => {
-      if (note.freq === 0) {
-        time += note.dur;
-        return;
+    if (musicMuted) {
+      if (currentAudio) {
+        fadeOut(currentAudio, 0.3, () => {
+          if (currentAudio) currentAudio.muted = true;
+        });
       }
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = note.freq;
-      gain.gain.setValueAtTime(0.08, time);
-      gain.gain.exponentialRampToValueAtTime(0.001, time + note.dur);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(time);
-      osc.stop(time + note.dur);
-      time += note.dur;
-    });
-
-    // Loop
-    const totalDuration = notes.reduce((sum, n) => sum + n.dur, 0);
-    setTimeout(() => {
-      if (musicPlaying) playMelody();
-    }, totalDuration * 1000 + 500);
+      updateMusicButton();
+    } else {
+      if (currentAudio) {
+        currentAudio.muted = false;
+        const playPromise = currentAudio.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            fadeIn(currentAudio, 0.3, 0.8);
+          }).catch(e => console.error("Error resuming:", e));
+        }
+      } else {
+        // If no audio exists yet (weird state), try playing current scene
+        playTrackForScene(currentScene);
+      }
+      updateMusicButton();
+    }
   }
+
+  function startMusicSystem() {
+    if (musicStarted) return;
+    musicStarted = true;
+    musicMuted = false;
+    musicPlaying = true;
+    console.log('🎵 Music system started via interaction.');
+    playTrackForScene(currentScene);
+
+    // Remove listeners
+    document.removeEventListener('click', startMusicSystem);
+    document.removeEventListener('touchstart', startMusicSystem);
+    document.removeEventListener('keydown', startMusicSystem);
+  }
+
+  // Auto-start music on ANY user interaction
+  document.addEventListener('click', startMusicSystem, { once: true });
+  document.addEventListener('touchstart', startMusicSystem, { once: true });
+  document.addEventListener('keydown', startMusicSystem, { once: true });
 
   // ===== LAUNCH =====
   if (document.readyState === 'loading') {

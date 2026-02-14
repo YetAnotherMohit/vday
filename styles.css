@@ -31,6 +31,10 @@
   --ink-light: #6B4F3A;
   --white: #FFFFFF;
   --shadow: rgba(61, 43, 31, 0.15);
+  --purple: #9B59B6;
+  --purple-light: #D7BDE2;
+  --purple-dark: #7D3C98;
+  --purple-glow: rgba(155, 89, 182, 0.25);
 
   --font-handwritten: 'Caveat', cursive;
   --font-script: 'Dancing Script', cursive;
@@ -145,7 +149,8 @@ body.no-scroll {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
+  padding: 30px 0;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.8s ease, visibility 0.8s ease;
@@ -228,7 +233,7 @@ body.no-scroll {
 /* washi_tape.png is a wide horizontal strip */
 .washi-tape-img {
   position: absolute;
-  z-index: 5;
+  z-index: 2;
   max-width: 180px;
   height: auto;
   pointer-events: none;
@@ -254,10 +259,10 @@ body.no-scroll {
   transform: rotate(-5deg);
 }
 
-/* === DECORATIVE SUNFLOWERS (scattered in scenes) === */
+/* === DECORATIVE SUNFLOWERS — behind content === */
 .deco-sunflower {
   position: absolute;
-  z-index: 2;
+  z-index: 1;
   pointer-events: none;
   filter: drop-shadow(2px 3px 5px rgba(0, 0, 0, 0.15));
 }
@@ -302,10 +307,10 @@ body.no-scroll {
   animation: floatSticker 5s ease-in-out infinite 0.5s;
 }
 
-/* === DECORATIVE ROSES === */
+/* === DECORATIVE ROSES — behind content === */
 .deco-rose {
   position: absolute;
-  z-index: 2;
+  z-index: 1;
   pointer-events: none;
   filter: drop-shadow(2px 3px 5px rgba(0, 0, 0, 0.15));
 }
@@ -338,7 +343,7 @@ body.no-scroll {
 /* mandolin_sticker.png is very tall portrait, use max-height only */
 .deco-mandolin {
   position: absolute;
-  z-index: 2;
+  z-index: 1;
   pointer-events: none;
   filter: drop-shadow(2px 3px 5px rgba(0, 0, 0, 0.15));
   max-height: 80px;
@@ -402,7 +407,7 @@ body.no-scroll {
   display: block;
   font-family: var(--font-handwritten);
   font-size: 14px;
-  color: var(--rose);
+  color: var(--purple);
   font-weight: 600;
   margin-top: -5px;
 }
@@ -597,8 +602,8 @@ body.no-scroll {
 
 .envelope {
   position: relative;
-  width: 360px;
-  height: 260px;
+  width: 380px;
+  height: 320px;
   margin: 0 auto;
   perspective: 800px;
 }
@@ -667,7 +672,7 @@ body.no-scroll {
   background: linear-gradient(180deg, var(--paper-aged), var(--cream-dark));
   clip-path: polygon(0 0, 50% 100%, 100% 0);
   transform-origin: top center;
-  transition: transform 0.8s ease;
+  transition: transform 1.2s ease;
   z-index: 4;
   border: 1px solid rgba(180, 160, 120, 0.3);
 }
@@ -681,31 +686,32 @@ body.no-scroll {
   top: 20px;
   left: 15px;
   right: 15px;
-  height: 180px;
+  height: 260px;
   background: var(--white);
   border-radius: 4px;
   z-index: 2;
-  padding: 15px;
+  padding: 18px 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.8s ease 0.4s;
+  transition: transform 1s ease-out 0.6s;
 }
 
 .envelope-letter.emerge {
-  transform: translateY(-120px);
+  transform: translateY(-180px);
+  z-index: 5;
 }
 
 /* srk_kajol.png — fit inside envelope letter */
 .letter-photo {
-  max-height: 100px;
-  max-width: 110px;
+  max-height: 140px;
+  max-width: 160px;
   width: auto;
   height: auto;
   border-radius: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
@@ -822,10 +828,10 @@ body.no-scroll {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 35%;
-  z-index: 1;
+  height: 30%;
+  z-index: 0;
   overflow: hidden;
-  opacity: 0.5;
+  opacity: 0.35;
 }
 
 .sunflowers-bg-img {
@@ -975,7 +981,7 @@ body.no-scroll {
 .card-signature {
   font-family: var(--font-script);
   font-size: 20px;
-  color: var(--rose);
+  color: var(--purple);
   margin-top: 12px;
 }
 
@@ -991,7 +997,7 @@ body.no-scroll {
   font-size: 20px;
   color: var(--ink);
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(244, 196, 48, 0.4), 0 0 0 2px var(--gold);
+  box-shadow: 0 4px 20px rgba(155, 89, 182, 0.3), 0 0 0 2px var(--gold);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -1352,10 +1358,10 @@ body.no-scroll {
 }
 
 .glow-text {
-  color: var(--rose);
+  color: var(--purple);
   font-weight: 600;
   font-size: 20px;
-  text-shadow: 0 0 10px rgba(232, 84, 124, 0.3);
+  text-shadow: 0 0 10px var(--purple-glow);
 }
 
 /* rose_sticker.png is roughly square */
@@ -1505,8 +1511,8 @@ body.no-scroll {
 .golden-glow {
   font-family: var(--font-script);
   font-size: 26px;
-  color: #B8860B;
-  text-shadow: 0 0 15px rgba(244, 196, 48, 0.5);
+  color: var(--purple-dark);
+  text-shadow: 0 0 15px var(--purple-glow);
   display: inline-block;
   animation: glowPulse 2s ease-in-out infinite;
 }
@@ -1515,11 +1521,11 @@ body.no-scroll {
 
   0%,
   100% {
-    text-shadow: 0 0 10px rgba(244, 196, 48, 0.3);
+    text-shadow: 0 0 10px rgba(155, 89, 182, 0.3);
   }
 
   50% {
-    text-shadow: 0 0 25px rgba(244, 196, 48, 0.7), 0 0 50px rgba(244, 196, 48, 0.3);
+    text-shadow: 0 0 25px rgba(155, 89, 182, 0.7), 0 0 50px rgba(155, 89, 182, 0.3);
   }
 }
 
@@ -1527,7 +1533,7 @@ body.no-scroll {
   margin-top: 20px;
   font-family: var(--font-script);
   font-size: 20px;
-  color: var(--rose);
+  color: var(--purple);
 }
 
 .infinity-heart {
