@@ -1,0 +1,16 @@
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Agent/AI files
+.agent/
+.gemini/
+
+# Misc
+*.log
+node_modules/

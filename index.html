@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Pardesh Se Pyaar 💛</title>
+  <meta name="description" content="A Valentine's Day scrapbook experience — Pardesh Se Pyaar">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <!-- Preloader -->
+  <div id="preloader">
+    <img src="assets/sunflower_single.png" alt="Loading" class="loader-sunflower-img">
+    <p class="loader-text">Pardesh Se Pyaar...</p>
+    <p class="loader-subtext">"Agar kisi cheez ko dil se chaho... toh poori kaaynat milane ki koshish mein lag jaati
+      hai"</p>
+  </div>
+
+  <!-- ===== SCENE 1: Naam Toh Suna Hoga ===== -->
+  <section id="scene1" class="scene active">
+    <div class="scrapbook-bg"></div>
+    <div class="torn-edge top"></div>
+
+    <!-- Real washi tape images -->
+    <img src="assets/washi_tape.png" alt="" class="washi-tape-img tape-pos-1">
+    <img src="assets/washi_tape.png" alt="" class="washi-tape-img tape-pos-2">
+
+    <!-- Scattered sunflowers decoration -->
+    <img src="assets/sunflower_single.png" alt="" class="deco-sunflower deco-s1-1">
+    <img src="assets/sunflower_single.png" alt="" class="deco-sunflower deco-s1-2">
+
+    <div class="scene1-content">
+      <!-- SRK arms open floating sticker — DDLJ iconic pose in mustard field -->
+      <div class="srk-sticker" id="srkFloat">
+        <img src="assets/srk_arms_open.png" alt="Arms wide open" class="sticker-img">
+        <span class="sticker-label">Naam toh suna hoga? 😎</span>
+      </div>
+
+      <!-- Polaroid with couple in mustard field — DDLJ vibes -->
+      <div class="polaroid" id="polaroid1">
+        <div class="polaroid-inner">
+          <div class="polaroid-image">
+            <img src="assets/srk_kajol_in_field.png" alt="In the mustard field" class="polaroid-photo">
+          </div>
+          <p class="polaroid-caption">"Bade bade deshon mein aisi chhoti chhoti baatein hoti rehti hain..."</p>
+        </div>
+      </div>
+
+      <!-- Typewriter cycles through iconic dialogues -->
+      <div class="typewriter-container">
+        <h1 id="typewriterText" class="typewriter"></h1>
+        <span class="typewriter-cursor">|</span>
+      </div>
+
+      <div class="name-gate">
+        <label class="handwritten-label">Aman... naam toh suna hoga? 💌</label>
+        <div class="input-wrapper">
+          <input type="text" id="nameInput" placeholder="Apna naam likho..." autocomplete="off" maxlength="20">
+          <div class="stamp-btn" id="enterBtn">
+            <img src="assets/postage_stamp.png" alt="Enter" class="stamp-img">
+          </div>
+        </div>
+        <p id="errorMsg" class="error-msg"></p>
+      </div>
+
+      <!-- Rose sticker decoration -->
+      <img src="assets/rose_sticker.png" alt="" class="deco-rose deco-rose-s1">
+    </div>
+    <div class="torn-edge bottom"></div>
+  </section>
+
+  <!-- ===== SCENE 2: Chiffon Ribbon Envelope ===== -->
+  <section id="scene2" class="scene">
+    <div class="scrapbook-bg bg2"></div>
+    <div class="sparkle-container" id="sparkleContainer"></div>
+
+    <!-- Decorations -->
+    <img src="assets/sunflower_single.png" alt="" class="deco-sunflower deco-s2-1">
+    <img src="assets/mandolin_sticker.png" alt="" class="deco-mandolin deco-s2-mandolin">
+
+    <!-- Dialogue strip at top -->
+    <div class="dialogue-strip top-strip">
+      <img src="assets/washi_tape.png" alt="" class="strip-tape">
+      <p class="strip-text">"Itni shiddat se maine tumhe paane ki koshish ki hai... ki har zarre ne mujhe tumse milane
+        ki saazish ki hai."</p>
+    </div>
+
+    <div class="scene2-content">
+      <div class="envelope-wrapper">
+        <div class="envelope" id="envelope">
+          <div class="envelope-back"></div>
+          <div class="envelope-letter" id="envelopeLetter">
+            <!-- Couple in flower field — sweet KKHH energy -->
+            <img src="assets/srk_kajol.png" alt="Us" class="letter-photo">
+            <p class="letter-preview">"Hum ek baar jeete hain, ek baar marte hain..."</p>
+            <p class="letter-preview small">"...aur pyaar bhi ek baar hi hota hai." 💛</p>
+          </div>
+          <div class="envelope-front">
+            <div class="filigree-border"></div>
+            <p class="envelope-name">For My Aman 💛</p>
+            <div class="wax-seal">❤️</div>
+          </div>
+          <div class="envelope-flap" id="envelopeFlap"></div>
+        </div>
+
+        <div class="ribbon-instruction" id="ribbonInstruction">
+          <span>👆 Ribbon upar swipe karo — kholo!</span>
+        </div>
+
+        <div class="ribbon-track">
+          <div class="ribbon" id="ribbon">
+            <img src="assets/sunflower_ribbon.png" alt="Ribbon" class="ribbon-img">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SCENE 3: Sunflower Field — Card Emerges ===== -->
+  <section id="scene3" class="scene">
+    <div class="scrapbook-bg bg3"></div>
+    <!-- Scattered sunflowers as field background -->
+    <div class="sunflower-field-real">
+      <img src="assets/sunflowers_scattered.png" alt="" class="sunflowers-bg-img">
+    </div>
+
+    <!-- Decorations -->
+    <img src="assets/washi_tape.png" alt="" class="washi-tape-img tape-pos-3">
+    <img src="assets/rose_sticker.png" alt="" class="deco-rose deco-rose-s3">
+
+    <div class="scene3-content">
+      <div class="mughal-card" id="mughalCard">
+        <div class="mughal-border">
+          <div class="mughal-corner tl"></div>
+          <div class="mughal-corner tr"></div>
+          <div class="mughal-corner bl"></div>
+          <div class="mughal-corner br"></div>
+        </div>
+        <div class="card-inner">
+          <!-- Romantic embrace — red saree couple — intense love -->
+          <img src="assets/SRKANDKAJOL.png" alt="" class="card-couple-img">
+          <h2 class="card-title">Mere Pyaare Aman</h2>
+          <div class="card-divider">
+            <img src="assets/sunflower_single.png" alt="" class="divider-sunflower">
+          </div>
+          <p class="card-message">
+            <span class="dialogue-quote">"Pyaar dosti hai..."</span><br>
+            Agar woh meri sabse achhi dost nahi ban sakti,<br>
+            toh main usse kabhi pyaar kar hi nahi sakta...<br><br>
+
+            Tu meri dost bhi hai, pyaar bhi hai —<br>
+            mera sab kuch hai tu.<br><br>
+
+            <span class="dialogue-quote">"Agar kisi cheez ko dil se chaho,<br>
+              toh poori kaaynat usse tumse<br>
+              milane ki koshish mein lag jaati hai."</span><br><br>
+
+            Maine chaha... aur kaaynat ne<br>
+            tujhe mujhse mila diya. 💛
+          </p>
+          <div class="card-divider">
+            <img src="assets/sunflower_single.png" alt="" class="divider-sunflower">
+          </div>
+          <div class="card-signature">— Tumhara, hamesha 💕</div>
+        </div>
+      </div>
+
+      <button class="golden-btn" id="toScene4Btn">
+        <span>Ek Surprise Hai... ✨</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== SCENE 4: 3½ Discovery (Scratch Reveal) ===== -->
+  <section id="scene4" class="scene">
+    <div class="scrapbook-bg bg4"></div>
+
+    <!-- Decorations -->
+    <img src="assets/sunflower_single.png" alt="" class="deco-sunflower deco-s4-1">
+    <img src="assets/sunflower_single.png" alt="" class="deco-sunflower deco-s4-2">
+    <img src="assets/rose_sticker.png" alt="" class="deco-rose deco-rose-s4">
+
+    <div class="scene4-content">
+      <h2 class="scratch-title">Scratch karke dekho! 💛</h2>
+      <p class="scratch-subtitle">"Chaho toh humein mita do... par yeh yaad rakhna..."</p>
+
+      <div class="scratch-card-wrapper">
+        <div class="scratch-reveal" id="scratchReveal">
+          <div class="hidden-message">
+            <div class="love-3half">
+              <span class="big-heart">❤️</span>
+              <h2>I Love You</h2>
+              <div class="three-half">3½</div>
+              <p>Aman ❤️</p>
+            </div>
+            <div class="blooming-sunflowers" id="bloomingSunflowers">
+              <img src="assets/sunflower_single.png" alt="" class="bloom-sf">
+              <img src="assets/sunflower_single.png" alt="" class="bloom-sf">
+              <img src="assets/sunflower_single.png" alt="" class="bloom-sf">
+              <img src="assets/sunflower_single.png" alt="" class="bloom-sf">
+              <img src="assets/sunflower_single.png" alt="" class="bloom-sf">
+            </div>
+          </div>
+          <canvas id="scratchCanvas"></canvas>
+        </div>
+      </div>
+
+      <p class="scratch-reveal-quote" id="scratchQuote" style="display:none;">
+        "Mar bhi jayein pyaar wale,<br>jivit rehti hai mohabbatein." 💛
+      </p>
+
+      <button class="golden-btn" id="toScene5Btn" style="display:none;">
+        <span>Aur Bhi Hai... 🎉</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== SCENE 5: Main Hoon Na — Grand Celebration ===== -->
+  <section id="scene5" class="scene">
+    <div class="scrapbook-bg bg5"></div>
+    <canvas id="confettiCanvas"></canvas>
+
+    <!-- Decorations -->
+    <img src="assets/sunflowers_scattered.png" alt="" class="deco-scattered-s5">
+
+    <div class="scene5-content">
+      <div class="srk-popup" id="srkPopup">
+        <img src="assets/srk_arms_open.png" alt="Main Hoon Na!" class="srk-popup-img">
+        <div class="srk-text">Main Hoon Na!</div>
+      </div>
+
+      <div class="celebration-card" id="celebrationCard">
+        <div class="heartbeat-ring"></div>
+        <h1 class="celebration-title">Happy Valentine's Day!</h1>
+        <div class="celebration-divider">
+          <img src="assets/sunflower_single.png" alt="" class="divider-sunflower">
+        </div>
+        <p class="celebration-message">
+          <span class="dialogue-quote">"Teri aankhon ki namkeen mastiyan...<br>
+            nahi bhoolunga main."</span><br><br>
+
+          <span class="dialogue-quote">"Jab tak hai jaan,<br>jab tak hai jaan." 💛</span><br><br>
+
+          Tu meri zindagi ka sabse khoobsurat hissa hai.<br>
+          Tere bina yeh dil, dil na lage...<br><br>
+
+          <span class="glow-text">"Duniya mein kitni hai nafratein...<br>
+            phir bhi dilon mein hai chahatein.<br>
+            Jivit rehti hai mohabbatein." 💛</span>
+        </p>
+        <img src="assets/rose_sticker.png" alt="" class="celebration-rose">
+      </div>
+
+      <button class="golden-btn final-btn" id="toFinalBtn">
+        <span>Ek Aakhri Baat... 💕</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== FINAL PAGE: Zindagi Bhar Pyar ===== -->
+  <section id="sceneFinal" class="scene">
+    <div class="scrapbook-bg bg-final"></div>
+    <div class="floating-hearts" id="floatingHearts"></div>
+
+    <!-- Scattered sunflowers background -->
+    <img src="assets/sunflowers_scattered.png" alt="" class="final-scattered-bg">
+
+    <div class="final-content">
+      <div class="final-card">
+        <div class="mughal-border gold">
+          <div class="mughal-corner tl"></div>
+          <div class="mughal-corner tr"></div>
+          <div class="mughal-corner bl"></div>
+          <div class="mughal-corner br"></div>
+        </div>
+
+        <div class="final-inner">
+          <!-- Veer Zaara pose — Mughal arch, emotional embrace → eternal devotion -->
+          <img src="assets/veer_zaara_pose.png" alt="" class="final-couple-img">
+
+          <h1 class="final-title">Mere Aman...</h1>
+          <div class="final-divider">
+            <img src="assets/sunflower_single.png" alt="" class="divider-sunflower">
+          </div>
+
+          <p class="final-message" id="finalMessage">
+            <span class="dialogue-quote">"Chaho toh humein mita do,<br>
+              par yeh yaad rakhna...<br>
+              ki hum tumse pyaar karte hain."</span>
+            <br><br>
+
+            Main tumhe zindagi bhar pyar karunga...
+            <br><br>
+            Aur marte dam tak pyar karunga...
+            <br><br>
+            <span class="golden-glow">Aur uske baad bhi. 💛</span>
+            <br><br>
+
+            <span class="dialogue-quote final-quote">"Itni shiddat se maine tumhe<br>
+              paane ki koshish ki hai...<br>
+              ki har zarre ne mujhe tumse<br>
+              milane ki saazish ki hai."</span>
+          </p>
+
+          <div class="final-signature">
+            <span>Forever & Always</span>
+            <div class="infinity-heart">∞ ❤️</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mandolin decoration — music of love -->
+      <img src="assets/mandolin_sticker.png" alt="" class="final-mandolin">
+
+      <div class="final-footer">
+        <p>Made with 💛 — Pardesh Se Pyaar</p>
+        <div class="footer-sunflowers">
+          <img src="assets/sunflower_single.png" alt="" class="footer-sf">
+          <img src="assets/sunflower_single.png" alt="" class="footer-sf">
+          <img src="assets/sunflower_single.png" alt="" class="footer-sf">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Background Music Toggle -->
+  <button class="music-toggle" id="musicToggle" title="Toggle Music">
+    🎵
+  </button>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
