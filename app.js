@@ -594,8 +594,9 @@
         musicPlaying = true;
         updateMusicButton();
       }).catch((error) => {
-        console.warn('🎵 Autoplay blocked or error:', error);
+        console.warn('🎵 Autoplay blocked:', error);
         musicPlaying = false;
+        musicStarted = false; // Allow retry on next interaction
         updateMusicButton();
       });
     }
