@@ -633,10 +633,14 @@
   function updateMusicButton() {
     if (musicPlaying && !musicMuted) {
       musicToggle.classList.add('playing');
-      musicToggle.textContent = '🎶';
+      musicToggle.textContent = '\uD83C\uDFB5'; // Note
+      musicToggle.style.background = 'rgba(46, 204, 113, 0.9)'; // Green
+      musicToggle.style.borderColor = '#27ae60';
     } else {
       musicToggle.classList.remove('playing');
-      musicToggle.textContent = '�';
+      musicToggle.textContent = '\uD83D\uDD07'; // Muted
+      musicToggle.style.background = 'rgba(231, 76, 60, 0.9)'; // Red
+      musicToggle.style.borderColor = '#c0392b';
     }
   }
 
@@ -680,19 +684,24 @@
     musicStarted = true;
     musicMuted = false;
     musicPlaying = true;
-    console.log('🎵 Music system started via interaction.');
-    playTrackForScene(currentScene);
+    console.log('🎵 Music system started by user interaction.');
 
-    // Remove listeners
-    document.removeEventListener('click', startMusicSystem);
-    document.removeEventListener('touchstart', startMusicSystem);
-    document.removeEventListener('keydown', startMusicSystem);
+    // Resume context if suspended (common on mobile)
+    if (currentAudio && currentAudio.context && currentAudio.context.state === 'suspended') {
+      currentAudio.context.resume();
+    }
+
+    playTrackForScene(currentScene);
   }
 
-  // Auto-start music on ANY user interaction
-  document.addEventListener('click', startMusicSystem, { once: true });
-  document.addEventListener('touchstart', startMusicSystem, { once: true });
-  document.addEventListener('keydown', startMusicSystem, { once: true });
+  // Auto-start music on ANY user interaction (Crucial for Android Chrome)
+  const events = ['click', 'touchstart', 'scroll', 'keydown'];
+  const startHandler = () => {
+    startMusicSystem();
+    const opts = { capture: true };
+    events.forEach(e => document.removeEventListener(e, startHandler, opts));
+  };
+  events.forEach(e => document.addEventListener(e, startHandler, { once: true, capture: true }));
 
   // ===== LAUNCH =====
   if (document.readyState === 'loading') {
