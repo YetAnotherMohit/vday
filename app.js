@@ -695,14 +695,81 @@
     playTrackForScene(currentScene);
   }
 
-  // Auto-start music on ANY user interaction (Crucial for Android Chrome)
-  const events = ['click', 'touchstart', 'scroll', 'keydown'];
-  const startHandler = () => {
+  // Attempt to start music loop
+  function attemptPlay() {
+    if (musicStarted && musicPlaying) return; // Already playing, we good.
+
+    console.log('🎵 aggressive attempt to start music...');
     startMusicSystem();
-    const opts = { capture: true };
-    events.forEach(e => document.removeEventListener(e, startHandler, opts));
+  }
+
+  // 1. Try immediately on load (rarely works, but worth trying)
+  window.addEventListener('load', attemptPlay);
+  document.addEventListener('DOMContentLoaded', attemptPlay);
+
+  // 2. Try on ANY interaction (Click, Touch, Scroll, Key)
+  // We keep these listeners active until music successfully starts
+  const interactions = ['click', 'touchstart', 'scroll', 'keydown', 'mousemove'];
+
+  const interactionHandler = () => {
+    if (!musicStarted || !musicPlaying) {
+      attemptPlay();
+    }
   };
-  events.forEach(e => document.addEventListener(e, startHandler, { once: true, capture: true }));
+
+  // Add capturing listeners for max priority
+  interactions.forEach(e => document.addEventListener(e, interactionHandler, { capture: true }));
+
+  // Monkey-patch playTrackForScene to clean up listeners on success
+  const originalPlayTrack = playTrackForScene;
+  playTrackForScene = function (sceneId) {
+    // Call original
+    const src = sceneTracks[sceneId];
+    if (!src) return;
+
+    if (currentTrackSrc === src && currentAudio && !currentAudio.paused) return;
+
+    // We copy the logic here because we need to hook into the SUCCESS
+    // ... or better, we just check musicPlaying flag periodically
+
+    // Let's rely on the existing logic but ensure we check success
+    // Re-implementing the core play start here to be safe and avoid recursion issues
+    console.log(`🎵 [Aggressive] Playing ${sceneId}`);
+
+    // Logic duped from above to ensure we catch the promise
+    if (currentAudio) {
+      // fade out old...
+      const old = currentAudio;
+      fadeOut(old, 2.0, () => { old.pause(); old.src = ''; });
+    }
+
+    const audio = new Audio(src);
+    audio.loop = true;
+    audio.volume = 0;
+    audio.muted = musicMuted;
+    currentAudio = audio;
+    currentTrackSrc = src;
+
+    const prom = audio.play();
+    if (prom !== undefined) {
+      prom.then(() => {
+        console.log('🎵 SUCCESS! Music started. Removing global listeners.');
+        fadeIn(audio, 2.0, musicMuted ? 0 : 0.8);
+        musicPlaying = true;
+        musicStarted = true;
+        updateMusicButton();
+
+        // CLEAN UP aggressively once we win
+        window.removeEventListener('load', attemptPlay);
+        interactions.forEach(e => document.removeEventListener(e, interactionHandler, { capture: true }));
+      }).catch(e => {
+        console.warn('🎵 Blocked by browser. Waiting for next interaction...', e);
+        musicPlaying = false;
+        musicStarted = false; // Reset so next click tries again
+        updateMusicButton();
+      });
+    }
+  };
 
   // ===== LAUNCH =====
   if (document.readyState === 'loading') {
