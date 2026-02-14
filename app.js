@@ -554,222 +554,112 @@
   let musicMuted = false;
   let musicStarted = false;
 
-  function playTrackForScene(sceneId) {
-    const src = sceneTracks[sceneId];
-    if (!src) return;
+  // Helper handlers
+  const interactions = ['click', 'touchstart', 'scroll', 'keydown', 'mousemove'];
 
-    console.log(`🎵 Attempting to play track for scene ${sceneId}: ${src}`);
-
-    // Same track already playing — don't restart, let it flow (Orchestra style)
-    if (currentTrackSrc === src && currentAudio && !currentAudio.paused) {
-      console.log('🎵 Track already playing, continuing flow.');
-      return;
-    }
-
-    // Crossfade: Slow cinematic fade out of old track
-    if (currentAudio) {
-      const oldAudio = currentAudio;
-      // 2.0s fade out for composed feel
-      fadeOut(oldAudio, 2.0, () => {
-        oldAudio.pause();
-        oldAudio.src = '';
-      });
-    }
-
-    // Create new audio
-    const audio = new Audio(src);
-    audio.loop = true;
-    audio.volume = 0;
-    audio.muted = musicMuted;
-    currentAudio = audio;
-    currentTrackSrc = src;
-
-    const playPromise = audio.play();
-
-    if (playPromise !== undefined) {
-      playPromise.then(() => {
-        console.log('🎵 Playback started successfully.');
-        // 2.0s fade in for smooth orchestral entry
-        fadeIn(audio, 2.0, musicMuted ? 0 : 0.8);
-        musicPlaying = true;
-        updateMusicButton();
-      }).catch((error) => {
-        console.warn('🎵 Autoplay blocked:', error);
-        musicPlaying = false;
-        musicStarted = false; // Allow retry on next interaction
-        updateMusicButton();
-      });
-    }
+  function interactionHandler() {
+    if (!musicStarted) attemptPlay();
   }
 
-  function fadeOut(audio, duration, onDone) {
-    const steps = 20;
-    const interval = (duration * 1000) / steps;
-    const volumeStep = audio.volume / steps;
-    let step = 0;
-    const timer = setInterval(() => {
-      step++;
-      audio.volume = Math.max(0, audio.volume - volumeStep);
-      if (step >= steps) {
-        clearInterval(timer);
-        if (onDone) onDone();
-      }
-    }, interval);
-  }
-
-  function fadeIn(audio, duration, targetVol) {
-    const steps = 20;
-    const interval = (duration * 1000) / steps;
-    const volumeStep = targetVol / steps;
-    let step = 0;
-    const timer = setInterval(() => {
-      step++;
-      audio.volume = Math.min(targetVol, audio.volume + volumeStep);
-      if (step >= steps) {
-        clearInterval(timer);
-      }
-    }, interval);
-  }
-
-  function updateMusicButton() {
-    if (musicPlaying && !musicMuted) {
-      musicToggle.classList.add('playing');
-      musicToggle.textContent = '\uD83C\uDFB5'; // Note
-      musicToggle.style.background = 'rgba(46, 204, 113, 0.9)'; // Green
-      musicToggle.style.borderColor = '#27ae60';
-    } else {
-      musicToggle.classList.remove('playing');
-      musicToggle.textContent = '\uD83D\uDD07'; // Muted
-      musicToggle.style.background = 'rgba(231, 76, 60, 0.9)'; // Red
-      musicToggle.style.borderColor = '#c0392b';
-    }
-  }
-
-  function toggleMusic() {
-    if (!musicStarted) {
-      // First time — start music explicitly
-      console.log('🎵 User toggled music: Starting first time.');
-      startMusicSystem();
-      return;
-    }
-
-    musicMuted = !musicMuted;
-    console.log(`🎵 User toggled music: Muted = ${musicMuted}`);
-
-    if (musicMuted) {
-      if (currentAudio) {
-        fadeOut(currentAudio, 0.3, () => {
-          if (currentAudio) currentAudio.muted = true;
-        });
-      }
-      updateMusicButton();
-    } else {
-      if (currentAudio) {
-        currentAudio.muted = false;
-        const playPromise = currentAudio.play();
-        if (playPromise !== undefined) {
-          playPromise.then(() => {
-            fadeIn(currentAudio, 0.3, 0.8);
-          }).catch(e => console.error("Error resuming:", e));
-        }
-      } else {
-        // If no audio exists yet (weird state), try playing current scene
-        playTrackForScene(currentScene);
-      }
-      updateMusicButton();
-    }
-  }
-
-  function startMusicSystem() {
-    if (musicStarted) return;
-    musicStarted = true;
-    musicMuted = false;
-    musicPlaying = true;
-    console.log('🎵 Music system started by user interaction.');
-
-    // Resume context if suspended (common on mobile)
-    if (currentAudio && currentAudio.context && currentAudio.context.state === 'suspended') {
-      currentAudio.context.resume();
-    }
-
-    playTrackForScene(currentScene);
-  }
-
-  // Attempt to start music loop
   function attemptPlay() {
-    if (musicStarted && musicPlaying) return; // Already playing, we good.
-
-    console.log('🎵 aggressive attempt to start music...');
+    if (musicStarted && musicPlaying) return;
+    console.log('🎵 Aggressive attempt to start music...');
     startMusicSystem();
   }
 
-  // 1. Try immediately on load (rarely works, but worth trying)
-  window.addEventListener('load', attemptPlay);
-  document.addEventListener('DOMContentLoaded', attemptPlay);
-
-  // 2. Try on ANY interaction (Click, Touch, Scroll, Key)
-  // We keep these listeners active until music successfully starts
-  const interactions = ['click', 'touchstart', 'scroll', 'keydown', 'mousemove'];
-
-  const interactionHandler = () => {
-    if (!musicStarted || !musicPlaying) {
-      attemptPlay();
-    }
-  };
-
-  // Add capturing listeners for max priority
-  interactions.forEach(e => document.addEventListener(e, interactionHandler, { capture: true }));
-
-  // Monkey-patch playTrackForScene to clean up listeners on success
-  const originalPlayTrack = playTrackForScene;
-  playTrackForScene = function (sceneId) {
-    // Call original
+  function playTrackForScene(sceneId) {
     const src = sceneTracks[sceneId];
     if (!src) return;
-
     if (currentTrackSrc === src && currentAudio && !currentAudio.paused) return;
-
-    // We copy the logic here because we need to hook into the SUCCESS
-    // ... or better, we just check musicPlaying flag periodically
-
-    // Let's rely on the existing logic but ensure we check success
-    // Re-implementing the core play start here to be safe and avoid recursion issues
     console.log(`🎵 [Aggressive] Playing ${sceneId}`);
 
-    // Logic duped from above to ensure we catch the promise
     if (currentAudio) {
-      // fade out old...
-      const old = currentAudio;
-      fadeOut(old, 2.0, () => { old.pause(); old.src = ''; });
+      currentAudio.pause();
+      currentAudio.src = '';
     }
 
     const audio = new Audio(src);
     audio.loop = true;
-    audio.volume = 0;
+    audio.volume = musicMuted ? 0 : 0.8;
     audio.muted = musicMuted;
     currentAudio = audio;
     currentTrackSrc = src;
 
     const prom = audio.play();
+
     if (prom !== undefined) {
       prom.then(() => {
-        console.log('🎵 SUCCESS! Music started. Removing global listeners.');
-        fadeIn(audio, 2.0, musicMuted ? 0 : 0.8);
+        console.log('🎵 SUCCESS! Music started.');
         musicPlaying = true;
         musicStarted = true;
         updateMusicButton();
-
-        // CLEAN UP aggressively once we win
         window.removeEventListener('load', attemptPlay);
         interactions.forEach(e => document.removeEventListener(e, interactionHandler, { capture: true }));
       }).catch(e => {
-        console.warn('🎵 Blocked by browser. Waiting for next interaction...', e);
+        console.warn('🎵 Blocked by browser.', e);
         musicPlaying = false;
-        musicStarted = false; // Reset so next click tries again
         updateMusicButton();
       });
     }
-  };
+  }
+
+  function updateMusicButton() {
+    if (musicPlaying && !musicMuted) {
+      musicToggle.classList.add('playing');
+      musicToggle.textContent = '\uD83C\uDFB5';
+      musicToggle.style.background = 'rgba(46, 204, 113, 0.9)';
+      musicToggle.style.borderColor = '#27ae60';
+    } else {
+      musicToggle.classList.remove('playing');
+      musicToggle.textContent = '\uD83D\uDD07';
+      musicToggle.style.background = 'rgba(231, 76, 60, 0.9)';
+      musicToggle.style.borderColor = '#c0392b';
+    }
+  }
+
+  function toggleMusic(e) {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    if (!musicStarted) {
+      console.log('🎵 User clicked button: Starting music for first time.');
+      musicStarted = true;
+      musicMuted = false;
+      musicPlaying = true;
+      updateMusicButton();
+      startMusicSystem();
+      return;
+    }
+
+    musicMuted = !musicMuted;
+    updateMusicButton();
+
+    if (musicMuted) {
+      if (currentAudio) currentAudio.muted = true;
+    } else {
+      if (currentAudio) {
+        currentAudio.muted = false;
+        if (currentAudio.paused) currentAudio.play().catch(e => console.error("Resume failed:", e));
+      } else {
+        playTrackForScene(currentScene);
+      }
+    }
+  }
+
+  function startMusicSystem() {
+    if (currentAudio && currentAudio.context && currentAudio.context.state === 'suspended') {
+      currentAudio.context.resume();
+    }
+    playTrackForScene(currentScene);
+  }
+
+  // 1. Try immediately on load
+  window.addEventListener('load', attemptPlay);
+  document.addEventListener('DOMContentLoaded', attemptPlay);
+
+  // 2. Try on ANY interaction
+  interactions.forEach(e => document.addEventListener(e, interactionHandler, { capture: true }));
 
   // ===== LAUNCH =====
   if (document.readyState === 'loading') {
